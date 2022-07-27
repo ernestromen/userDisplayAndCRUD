@@ -30,6 +30,9 @@ if(!($result)){
 die();
 }else{
 
+  //Database connection
+  include 'db_connection.php';
+
     $result = json_decode($result,true);
 
     $nameArr = $result['results'][0]['name'];
@@ -55,24 +58,69 @@ die();
     //Profile picture aquired!
     $profilePic = $result['results'][0]['picture']['large'];
     
-    $userDeatils = [];
-    
-    $userDetails['name'] = $finalName;
-    $userDetails['age'] = $age;
-    $userDetails['country'] = $country;
-    $userDetails['email'] = $email;
-    $userDetails['profile_pic'] = $profilePic;
-    
 
+    
+    if(isset($_POST['ajaxBtn'])){
+
+        $finalName = filter_var($finalName, FILTER_SANITIZE_STRING);
+        $finalName = mysqli_real_escape_string($conn, $finalName);
+        
+        $age = filter_var($age, FILTER_SANITIZE_STRING);
+        $age = mysqli_real_escape_string($conn, $age);
+        $age = intval($age);
+        
+        
+        $country = filter_var($country, FILTER_SANITIZE_STRING);
+        $country = mysqli_real_escape_string($conn, $country);
+        
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+        $email = mysqli_real_escape_string($conn, $email);
+        
+        $profilePic = filter_var($profilePic, FILTER_SANITIZE_STRING);
+        $profilePic = mysqli_real_escape_string($conn, $profilePic);
+            
+        //Insert into database!
+        
+        $sql2 = "SELECT * FROM users";
+        $result2 = $conn->query($sql2)->fetch_all(MYSQLI_ASSOC);
+        
+        //Limits up to 10 users in database
+        
+        if(count($result2) < 10){
+        
+            $sql = "INSERT INTO `users`( `name`, `age`, `country`, `email`, `profile_pic`) VALUES ('$finalName', '$age','$country', '$email','$profilePic');";
+            $result = $conn->query($sql);
+            
+            if($result){
+                echo  "Insetion of data is successful!";
+            }else{
+        
+                echo 'Insetion of data failed!';
+            };
+        }else if(count($result2) >=10){
+            //Updates the first user row in database
+            $sql = "UPDATE `users` SET `name`='$name',`age`='$age',`country`='$country',`email`='$email',`profile_pic`= '$profile_pic' WHERE id = 1";
+        // $result = $conn->query($sql);
+        $result = mysqli_query($conn,$sql);
+        
+        if($result){
+            echo  'updating of data is successful!';
+        }else{
+            echo 'updating of data failed!';
+        };
+        
+        }
+    }
 }
 
-  //Database connection
-  include 'db_connection.php';
+
 
 
   //Fetching number of users to display
   $sql = "SELECT * FROM users";
   $numberOfUsers = count($conn->query($sql)->fetch_all(MYSQLI_ASSOC));
+// var_dump($conn);
+mysqli_close($conn);
 
 ?>
 
@@ -106,7 +154,11 @@ die();
     <div class="desc">number of users:</div>
     <div id="numberOfUsers" class="desc"><?=(($numberOfUsers));?></div>
 </div>
-<button  class="ajaxBtn btn" type="">Add user</button>
+<form method="POST">
+<button type="submit" name="ajaxBtn"  class="ajaxBtn btn" type="">Add user</button>
+
+
+</form>
 <button class="ajaxDeleteUsers btn" type="">Delete all users</button>
 <span style="
 justify-content:center;
@@ -120,60 +172,7 @@ font-weight:600;
 </div>
     </body>
     <script>
-
-
-let name = $("#hiddenInputName").val();
-let age = $("#hiddenInputAge").val();
-let country = $("#hiddenInputCountry").val();
-let email = $("#hiddenInputEmail").val();
-let profile_pic = $("#hiddenInputPicture").val();
-
-let ob = {
-name,
-age,
-country,
-email,
-profile_pic
-
-}
-
-ob = JSON.stringify(ob);
-
-
-
-//Adding user from api to database
-$(".ajaxBtn").click(function(){
-
-    
-    let newNumber = parseInt($('#numberOfUsers').text());
-    if(newNumber < 10 ){
-        newNumber = newNumber +1;
-    $('#numberOfUsers').text(newNumber);
-    }else{
-
-$('.error').css('display','block');
-    }
-
-
-    $.ajax({
-   url: 'saveToDataBase.php',
-   data: {data: ob},
-//    contentType: "application/json",
-   type: 'POST',
-   success: function(response) {
-      console.log(response);
-
-   }
-});
-
-});
-
-
-
 //Deleting all users from database
-
-
-
 $(".ajaxDeleteUsers").click(function(){
     $('.error').css('display','none');
 

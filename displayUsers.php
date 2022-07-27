@@ -5,6 +5,7 @@
 //Fetching users to display
 $sql = "SELECT name,age,country,email,profile_pic FROM users";
 $usersForDisplay = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+
 ?>
 
 
@@ -20,11 +21,12 @@ $usersForDisplay = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
         <style>
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto auto auto ;
+  grid-template-columns: 20% 20% 20% 20% 20% ;
   background-color: #2196F3;
   padding: 10px;
 }
 .grid-item {
+  word-break: break-word;
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.8);
   padding: 20px;
@@ -42,7 +44,7 @@ $usersForDisplay = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
   <div class="grid-item">name</div>
   <div class="grid-item">age</div>
   <div class="grid-item">country</div>  
-  <div class="grid-item">email</div>
+  <div style="" class="grid-item">email</div>
   <div class="grid-item">picture</div>
 </div>
 <?php else:?>
