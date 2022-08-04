@@ -92,10 +92,11 @@ die();
             $result = $conn->query($sql);
             
             if($result){
-                echo  "Insetion of data is successful!";
+                echo '<div class="tmpDB" style="text-align:center;background-color:red;border:1px solid black; color:white;width:20%;margin:auto;">updating of data completed!</div>';
+
             }else{
-        
-                echo 'Insetion of data failed!';
+                echo '<div class="tmpDB" style="text-align:center;background-color:red;border:1px solid black; color:white;width:20%;margin:auto;">Insetion of data failed!</div>';
+
             };
         }else if(count($result2) >=10){
             //Updates the first user row in database
@@ -104,9 +105,9 @@ die();
         $result = mysqli_query($conn,$sql);
         
         if($result){
-            echo  'updating of data is successful!';
+            echo '<div class="tmpDB" style="text-align:center;background-color:red;border:1px solid black; color:white;width:20%;margin:auto;">updating of data completed!</div>';
         }else{
-            echo 'updating of data failed!';
+            echo '<div class="tmpDB" style="text-align:center;background-color:red;border:1px solid black; color:white;width:20%;margin:auto;">Insetion of data failed!</div>';
         };
         
         }
@@ -135,7 +136,17 @@ mysqli_close($conn);
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
         <link rel="stylesheet" href="style.css">
 
+<style>
+    .deleteComment,.DBmessage{display:none;}
+</style>
+<script>
 
+if(document.querySelector('.tmpDB') !== 'null'){
+    setTimeout(() => {
+        document.querySelector('.tmpDB').style.display = 'none';
+    }, 1500);
+}
+</script>
 	</head>
 	<body>
 
@@ -146,6 +157,7 @@ mysqli_close($conn);
 <input id="hiddenInputEmail" type="hidden" value="<?php echo $userDetails['email'];?>">
 <input id="hiddenInputPicture" type="hidden" value="<?php echo $userDetails['profile_pic'];?>">
 
+<h1 class="DBmessage"></h1>
 
 <?php if($result):?>
 <div class="biggerBox">
@@ -160,31 +172,39 @@ mysqli_close($conn);
 
 </form>
 <button class="ajaxDeleteUsers btn" type="">Delete all users</button>
+<span class="deleteComment error">users deleted!</span>
 <span style="
 justify-content:center;
 display:flex;
 font-size:20px;
 font-weight:600;
-"><a href="http://localhost/phpnewtest/displayUsers.php">List of user from database page</a></span>
+"><a href="http://localhost/userDisplayAndCRUD/displayUsers.php">List of user from database page</a></span>
 <span class="error">Cannot add more then 10 users!</span>
     <?php endif;?>
 
 </div>
     </body>
     <script>
+        
 //Deleting all users from database
 $(".ajaxDeleteUsers").click(function(){
     $('.error').css('display','none');
-
-    let newNumber = parseInt($('#numberOfUsers').text());
-        newNumber = 0;
-    $('#numberOfUsers').text(newNumber);
-
     $.ajax({
    url: 'deleteAllUsers.php',
    type: 'POST',
    success: function(response) {
-      console.log(response);
+    if(parseInt(document.querySelector('#numberOfUsers').innerHTML) > 0){
+        document.querySelector('.deleteComment').style.display = 'block';
+setTimeout(() => {
+    document.querySelector('.deleteComment').style.display = 'none';
+
+}, 1500);        
+    }
+
+
+    let newNumber = parseInt($('#numberOfUsers').text());
+        newNumber = 0;
+    $('#numberOfUsers').text(newNumber);
 
    }
 });
